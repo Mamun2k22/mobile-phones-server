@@ -126,8 +126,9 @@ async function run() {
             const result = await bookingCollection.insertOne(booking);
             res.send(result);
         });
+
         // booking Get by email 
-        app.get('/bookings', verifyJWT, async (req, res) => {
+        app.get('/bookings', async (req, res) => {
             let email = req.query.email;
             const query = { email: email };
             const booking = await bookingCollection.find(query).toArray();
@@ -154,6 +155,38 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         });
+
+        //
+
+        app.delete('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await userCollection.deleteOne(filter);
+            res.send(result);
+        });
+
+        // Kichu
+        //  seller role 
+        app.get('/user/sellar/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const person = await userCollection.findOne(query);
+            res.send({ isSellar: person?.designation === 'Seller' })
+        })
+
+
+
+
+
+
+        // make admin role 
+        app.get('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await userCollection.findOne(query);
+            res.send({ isAdmin: user?.role === 'admin' })
+        })
+
 
 
 
