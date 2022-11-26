@@ -46,12 +46,7 @@ async function run() {
         const bookingCollection = client.db('phoneResale').collection('bookings');
         const paymentsCollection = client.db('phoneResale').collection('payments');
 
-        //Data loading
-
-
-
-
-
+        //
 
         app.get('/products', async (req, res) => {
             const query = {};
@@ -69,12 +64,21 @@ async function run() {
 
 
         // delete product 
-        app.delete('/products/:id', verifyJWT, async (req, res) => {
+        app.delete('/products/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await productsCollection.deleteOne(filter);
             res.send(result);
         });
+
+        // delete booking 
+        app.delete('/booking/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await bookingCollection.deleteOne(filter);
+            res.send(result);
+        });
+
 
         app.get('/categories', async (req, res) => {
             const query = {};
@@ -84,7 +88,7 @@ async function run() {
 
         app.get('/category/Products/:name', async (req, res) => {
             const category = req.params.name;
-            const categoryName = await productsCollection.find({ categoryname: category }).toArray();
+            const categoryName = await productsCollection.find({ categoryName: category }).toArray();
             res.send(categoryName);
         });
 
@@ -93,9 +97,12 @@ async function run() {
         // post user details 
         app.post('/users', async (req, res) => {
             const user = req.body;
+            user.verified = false;
             const result = await userCollection.insertOne(user);
             res.send(result);
-        });
+        })
+
+
         //add products 
         app.post('/products', async (req, res) => {
             const user = req.body;
@@ -186,6 +193,29 @@ async function run() {
             const user = await userCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' })
         })
+
+        //
+        // get all seller 
+        app.get('/allseller', async (req, res) => {
+            const role = req.query.role
+            const query = { designation: role }
+            const users = await userCollection.find(query).toArray();
+            res.send(users)
+        });
+        // make verify seller 
+        app.put('/allseller/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    verified: true
+                }
+            }
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        });
+
 
 
 
