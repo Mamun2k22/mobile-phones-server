@@ -32,7 +32,6 @@ function verifyJWT(req, res, next) {
 };
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ldmt6s4.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -48,6 +47,16 @@ async function run() {
 
         //Data loading
 
+        const verifyAdmin = async (req, res, next) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await userCollection.findOne(query);
+
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ message: ' forbidden access' })
+            }
+            next();
+        }
 
 
 
@@ -140,6 +149,7 @@ async function run() {
             const result = await bookingCollection.findOne(filter);
             res.send(result);
         });
+
 
 
     }
