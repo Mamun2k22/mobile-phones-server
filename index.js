@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+//
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
@@ -102,6 +103,21 @@ async function run() {
             res.send(result);
         })
 
+        // JWT Token
+
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await userCollection.findOne(query);
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '30d' })
+                return res.send({ accessToken: token });
+
+            }
+            res.status(403).send({ accessToken: '' })
+
+        })
+
 
 
         //add products 
@@ -154,6 +170,8 @@ async function run() {
             res.send(result);
         });
 
+
+
         // Make Admin 
         app.put('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
@@ -177,7 +195,7 @@ async function run() {
             res.send(result);
         });
 
-        // Kichu
+
         //  seller role 
         app.get('/user/sellar/:email', async (req, res) => {
             const email = req.params.email;
