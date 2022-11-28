@@ -228,11 +228,14 @@ async function run() {
             const users = await userCollection.find(query).toArray();
             res.send(users)
         });
-        // make verify seller 
+
+
+        // make verify seller >>>>>>>
+
         app.put('/allseller/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
-            const options = { upsert: true };
+            // const options = { upsert: true };
             const updateDoc = {
                 $set: {
 
@@ -240,7 +243,7 @@ async function run() {
                         : true
                 }
             }
-            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result)
         });
 
