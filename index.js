@@ -155,9 +155,10 @@ async function run() {
             res.send(result);
         });
 
-        // booking Get by email 
+        // booking to email 
         app.get('/bookings', async (req, res) => {
             let email = req.query.email;
+            console.log('token', req.headers.authorization);
             const query = { email: email };
             const booking = await bookingCollection.find(query).toArray();
             res.send(booking);
@@ -221,7 +222,9 @@ async function run() {
         // get all seller 
         app.get('/allseller', async (req, res) => {
             const role = req.query.role
-            const query = { designation: role }
+            const query = {
+                designation: role
+            }
             const users = await userCollection.find(query).toArray();
             res.send(users)
         });
@@ -232,7 +235,9 @@ async function run() {
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    verified: true
+
+                    verified
+                        : true
                 }
             }
             const result = await userCollection.updateOne(filter, updateDoc, options);
